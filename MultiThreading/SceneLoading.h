@@ -15,7 +15,6 @@ public:
 	void disable() override;
 
 private:
-
 	float elapsedTime = 0.0f;
 
 	GameObject *progressBar = nullptr;

@@ -2,7 +2,7 @@
 
 #include "Module.h"
 
-//#define USE_TASK_MANAGER
+#define USE_TASK_MANAGER
 
 struct Texture;
 
