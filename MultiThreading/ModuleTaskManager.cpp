@@ -3,34 +3,33 @@
 
 void ModuleTaskManager::threadMain()
 {
-	beginning:
-
-	Task* task = nullptr;
+	for (;;)
 	{
-		
-		std::unique_lock<std::mutex> lock(mtx);
-		while (scheduledTasks.empty())
+		Task* task = nullptr;
 		{
-			// TODO 3:
-			// - Wait for new tasks to arrive
-			// - Retrieve a task from scheduledTasks
-			// - Execute it
-			// - Insert it into finishedTasks
 
-			if (exitFlag)
-				return;
+			std::unique_lock<std::mutex> lock(mtx);
+			while (scheduledTasks.empty())
+			{
+				// TODO 3:
+				// - Wait for new tasks to arrive
+				// - Retrieve a task from scheduledTasks
+				// - Execute it
+				// - Insert it into finishedTasks
 
-			event.wait(lock);
+				if (exitFlag)
+					return;
+
+				event.wait(lock);
+			}
+
+			task = scheduledTasks.front();
+			scheduledTasks.pop();
 		}
 
-		task = scheduledTasks.front();
-		scheduledTasks.pop();		
+		task->execute();
+		finishedTasks.push(task);
 	}
-	
-	task->execute();
-	finishedTasks.push(task);	
-
-	goto beginning;
 }
 
 bool ModuleTaskManager::init()
