@@ -73,6 +73,11 @@ void client(const char *serverAddrStr, int port)
 		if (res < 1)
 		{
 			int error_code = WSAGetLastError();
+
+			//Error 10054:
+			//Se ha forzado la interrupci¾n de una conexi¾n existente por el host remoto.
+			//Solo en mi casa, aquí no sucede.
+
 			printWSErrorAndExit("Receive Pong");
 		}
 
