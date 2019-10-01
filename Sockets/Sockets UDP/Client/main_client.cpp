@@ -59,6 +59,9 @@ void client(const char *serverAddrStr, int port)
 		// - Control errors in both cases
 
 		int res = sendto(s, "Ping", strlen("Ping"), 0, (const sockaddr*)&remoteAddr, sizeof(remoteAddr));
+
+		std::cout << "Ping ";
+
 		if(res < 1)
 		{
 			printWSErrorAndExit("Sending Ping");
@@ -69,6 +72,7 @@ void client(const char *serverAddrStr, int port)
 		res = recvfrom(s, receivedData, 10, 0, (sockaddr*)&remoteAddr, &remoteAdrrSize);
 		if (res < 1)
 		{
+			int error_code = WSAGetLastError();
 			printWSErrorAndExit("Receive Pong");
 		}
 
