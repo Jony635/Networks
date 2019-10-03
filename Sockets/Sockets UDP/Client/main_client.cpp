@@ -58,7 +58,7 @@ void client(const char *serverAddrStr, int port)
 		// - Receive 'pong' packet from the server
 		// - Control errors in both cases
 
-		int res = sendto(s, "Ping", strlen("Ping"), 0, (const sockaddr*)&remoteAddr, sizeof(remoteAddr));
+		int res = sendto(s, "Ping", strlen("Ping") + 1, 0, (const sockaddr*)&remoteAddr, sizeof(remoteAddr));
 
 		std::cout << "Ping ";
 
@@ -70,15 +70,15 @@ void client(const char *serverAddrStr, int port)
 		char* receivedData = new char[10];
 		int remoteAdrrSize = sizeof(remoteAddr);
 		res = recvfrom(s, receivedData, 10, 0, (sockaddr*)&remoteAddr, &remoteAdrrSize);
+
 		if (res < 1)
 		{
-			int error_code = WSAGetLastError();
-
-			//Error 10054:
-			//Se ha forzado la interrupci¾n de una conexi¾n existente por el host remoto.
-			//Solo en mi casa, aquí no sucede.
-
 			printWSErrorAndExit("Receive Pong");
+		}
+
+		else
+		{
+			std::cout << receivedData << "\n";
 		}
 
 		delete[] receivedData;

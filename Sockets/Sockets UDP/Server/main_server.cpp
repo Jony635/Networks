@@ -72,12 +72,16 @@ void server(int port)
 		{
 			printWSErrorAndExit("Receive Ping");
 		}
+		else
+			std::cout << receivedData << " ";
 
-		int res = sendto(s, "Pong", strlen("Pong"), 0, (const sockaddr*)& bindAddr, sizeof(bindAddr));
+		int res = sendto(s, "Pong", strlen("Pong") + 1, 0, (const sockaddr*)& bindAddr, sizeof(bindAddr));
 		if (res < 1)
 		{
 			printWSErrorAndExit("Sending Pong");
-		}	
+		}
+		else
+			std::cout << "Pong\n";
 
 		delete[] receivedData;
 	}
