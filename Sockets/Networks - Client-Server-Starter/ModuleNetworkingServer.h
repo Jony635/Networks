@@ -56,6 +56,8 @@ private:
 
 	SOCKET listenSocket;
 
+
+
 	struct ConnectedSocket
 	{
 		sockaddr_in address;

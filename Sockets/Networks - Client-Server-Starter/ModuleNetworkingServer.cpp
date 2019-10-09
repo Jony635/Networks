@@ -1,8 +1,5 @@
 #include "ModuleNetworkingServer.h"
 
-
-
-
 //////////////////////////////////////////////////////////////////////
 // ModuleNetworkingServer public methods
 //////////////////////////////////////////////////////////////////////
@@ -10,11 +7,32 @@
 bool ModuleNetworkingServer::start(int port)
 {
 	// TODO(jesus): TCP listen socket stuff
+
 	// - Create the listenSocket
+	listenSocket = socket(AF_INET, SOCK_STREAM, 0);
+
 	// - Set address reuse
+	bool enable = true;
+	int result = setsockopt(listenSocket, SOL_SOCKET, SO_REUSEADDR, (const char*)& enable, sizeof(enable));
+	if (result != NO_ERROR)
+	{
+		ELOG("SERVER ERROR: Could not enable addresses reuse.");
+		return false;
+	}
+
 	// - Bind the socket to a local interface
+	sockaddr_in address;
+	address.sin_family = AF_INET;
+	address.sin_port = htons(port);
+	address.sin_addr.S_un.S_addr = INADDR_ANY;
+
+	bind(listenSocket, (const sockaddr*)&address, sizeof(address));
+
 	// - Enter in listen mode
+	listen(listenSocket, SOMAXCONN);
+
 	// - Add the listenSocket to the managed list of sockets using addSocket()
+	addSocket(listenSocket);
 
 	state = ServerState::Listening;
 

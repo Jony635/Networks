@@ -1,20 +1,38 @@
 #include "ModuleNetworkingClient.h"
 
-
 bool  ModuleNetworkingClient::start(const char * serverAddressStr, int serverPort, const char *pplayerName)
 {
 	playerName = pplayerName;
 
 	// TODO(jesus): TCP connection stuff
+
 	// - Create the socket
+	clientSocket = socket(AF_INET, SOCK_STREAM, 0);
+
 	// - Create the remote address object
+	sockaddr_in address;
+	address.sin_family = AF_INET;
+	address.sin_port = htons(serverPort);
+	inet_pton(AF_INET, serverAddressStr, &address.sin_addr);
+
 	// - Connect to the remote address
-	// - Add the created socket to the managed list of sockets using addSocket()
+	int result = connect(clientSocket, (const sockaddr*)&address, sizeof(address));
+	if (result != NO_ERROR)
+	{
+		ELOG("CLIENT ERROR: Could not connect to the server address.");
 
-	// If everything was ok... change the state
-	state = ClientState::Start;
+		return false;
+	}
+	else
+	{
+		// - Add the created socket to the managed list of sockets using addSocket()
+		addSocket(clientSocket);
 
-	return true;
+		// If everything was ok... change the state
+		state = ClientState::Start;
+
+		return true;
+	}
 }
 
 bool ModuleNetworkingClient::isRunning() const
@@ -27,6 +45,14 @@ bool ModuleNetworkingClient::update()
 	if (state == ClientState::Start)
 	{
 		// TODO(jesus): Send the player name to the server
+
+		if (send(clientSocket, playerName.c_str(), playerName.size() + 1, 0) == SOCKET_ERROR)
+		{
+			ELOG("CLIENT ERROR: Error sending playerName to server");
+			return false;
+		}
+		
+		state = ClientState::Logging;
 	}
 
 	return true;
@@ -51,7 +77,7 @@ bool ModuleNetworkingClient::gui()
 	return true;
 }
 
-void ModuleNetworkingClient::onSocketReceivedData(SOCKET socket, byte * data)
+void ModuleNetworkingClient::onSocketReceivedData(SOCKET socket, byte* data)
 {
 	state = ClientState::Stopped;
 }
