@@ -54,10 +54,6 @@ bool ModuleNetworking::preUpdate()
 {
 	if (sockets.empty()) return true;
 
-	// NOTE(jesus): You can use this temporary buffer to store data from recv()
-	const uint32 incomingDataBufferSize = Kilobytes(1);
-	byte incomingDataBuffer[incomingDataBufferSize];
-
 	// TODO(jesus): select those sockets that have a read operation available
 
 	fd_set socketSet;
@@ -121,7 +117,8 @@ bool ModuleNetworking::preUpdate()
 			// TODO(jesus): Finally, remove all disconnected sockets from the list
 			// of managed sockets.
 
-			int result = recv(socket, (char*)incomingDataBuffer, incomingDataBufferSize, 0);
+			InputMemoryStream packet;
+			int result = recv(socket, packet.GetBufferPtr(), packet.GetCapacity(), 0);
 			if (result == SOCKET_ERROR)
 			{
 				int code = WSAGetLastError();
@@ -155,7 +152,8 @@ bool ModuleNetworking::preUpdate()
 			}
 			else
 			{
-				onSocketReceivedData(socket, incomingDataBuffer);
+				packet.SetSize((uint32)result);
+				onSocketReceivedData(socket, packet);
 			}		
 		}
 	}
@@ -178,6 +176,17 @@ bool ModuleNetworking::cleanUp()
 		}
 	}
 
+	return true;
+}
+
+bool ModuleNetworking::sendPacket(const OutputMemoryStream& packet, SOCKET socket)
+{
+	int result = send(socket, packet.GetBufferPtr(), packet.GetSize(), 0);
+	if (result == SOCKET_ERROR)
+	{
+		reportError("send");
+		return false;
+	}
 	return true;
 }
 
