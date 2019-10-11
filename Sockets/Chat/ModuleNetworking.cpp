@@ -138,8 +138,6 @@ bool ModuleNetworking::preUpdate()
 						break;
 					}
 				}
-
-				return false;
 			}
 			else if (result == 0)
 			{
