@@ -110,11 +110,47 @@ void ModuleNetworkingServer::onSocketConnected(SOCKET socket, const sockaddr_in 
 void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemoryStream& packet)
 {
 	// Set the player name of the corresponding connected socket proxy
-	for (auto &connectedSocket : connectedSockets)
+
+	ClientMessage clientMessage;
+	packet >> clientMessage;
+
+	if (clientMessage == ClientMessage::Hello)
 	{
-		if (connectedSocket.socket == socket)
+		std::string playerName;
+		packet >> playerName;
+		
+		for (auto& connectedSocket : connectedSockets)
 		{
-			connectedSocket.playerName = (const char *)data;
+			if (connectedSocket.playerName == playerName)
+			{
+				//Send PlayerNameUnavailable packet
+				OutputMemoryStream outPacket;
+				outPacket << ServerMessage::PlayerNameUnavailable;
+
+				if (!sendPacket(outPacket, socket))
+				{
+					ELOG("SERVER ERROR: ERROR SENDING PlayerNameUnavailable MESSAGE TO THE CONNECTED CLIENT");
+				}
+
+				return;
+			}
+		}
+
+		for (auto& connectedSocket : connectedSockets)
+		{
+			if (connectedSocket.socket == socket)
+			{
+				connectedSocket.playerName = playerName;
+
+				//Send welcome packet
+				OutputMemoryStream outPacket;
+				outPacket << ServerMessage::Welcome;
+
+				if (!sendPacket(outPacket, socket))
+				{
+					ELOG("SERVER ERROR: ERROR SENDING WELCOME MESSAGE TO THE CONNECTED CLIENT");
+				}
+			}
 		}
 	}
 }

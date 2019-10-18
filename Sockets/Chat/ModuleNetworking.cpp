@@ -123,7 +123,6 @@ bool ModuleNetworking::preUpdate()
 			{
 				int code = WSAGetLastError();
 
-				ELOG("NETWORKING ERROR: Error receiving connected server messages");
 				onSocketDisconnected(socket);
 
 				//Clean disconnected socket

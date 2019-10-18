@@ -3,7 +3,7 @@
 
 class ModuleNetworking : public Module
 {
-private:
+protected:
 
 	//////////////////////////////////////////////////////////////////////
 	// Module virtual methods

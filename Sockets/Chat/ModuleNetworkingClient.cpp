@@ -46,13 +46,21 @@ bool ModuleNetworkingClient::update()
 	{
 		// TODO(jesus): Send the player name to the server
 
-		if (send(clientSocket, playerName.c_str(), playerName.size() + 1, 0) == SOCKET_ERROR)
+		OutputMemoryStream packet;
+		packet << ClientMessage::Hello;
+		packet << playerName;
+
+		if (sendPacket(packet, clientSocket))
+		{
+			state = ClientState::Logging;
+		}
+		else
 		{
 			ELOG("CLIENT ERROR: Error sending playerName to server");
-			return false;
+
+			disconnect();
+			state = ClientState::Stopped;
 		}
-		
-		state = ClientState::Logging;
 	}
 
 	return true;
@@ -79,7 +87,21 @@ bool ModuleNetworkingClient::gui()
 
 void ModuleNetworkingClient::onSocketReceivedData(SOCKET socket, const InputMemoryStream& packet)
 {
-	state = ClientState::Stopped;
+	//state = ClientState::Stopped;
+
+	ServerMessage type;
+	packet >> type;
+
+	if (type == ServerMessage::Welcome)
+	{
+		LOG("Welcome received from the server");
+	}
+	else if (type == ServerMessage::PlayerNameUnavailable)
+	{
+		LOG("My name is not available");
+		state = ClientState::Stopped;
+		disconnect();
+	}
 }
 
 void ModuleNetworkingClient::onSocketDisconnected(SOCKET socket)
