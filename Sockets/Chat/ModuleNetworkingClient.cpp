@@ -51,8 +51,7 @@ bool ModuleNetworkingClient::update()
 		packet << playerName;
 
 		if (sendPacket(packet, clientSocket))
-		{
-			state = ClientState::Logging;
+		{			
 		}
 		else
 		{
@@ -79,12 +78,20 @@ bool ModuleNetworkingClient::gui()
 
 		ImGui::Text("%s connected to the server...", playerName.c_str());
 
+		//MESSAGE SENDING
 		char message[1024] = "";
 		ImVec2 windowPos = ImGui::GetWindowPos();
 		ImGui::SetCursorScreenPos({ ImGui::GetCursorScreenPos().x, windowPos.y + ImGui::GetWindowHeight() - 30});
 		ImGui::AlignTextToFramePadding();
 		ImGui::Text("Message:"); ImGui::SameLine();
-		ImGui::InputText("##MessageInput", message, 1024);
+		if (ImGui::InputText("##MessageInput", message, 1024, ImGuiInputTextFlags_::ImGuiInputTextFlags_EnterReturnsTrue))
+		{
+			//SEND THE MESSAGE TO THE SERVER
+			OutputMemoryStream packet;
+			packet << ClientMessage::NewMessage;
+			packet << message;
+			sendPacket(packet, clientSocket);
+		}
 
 		ImGui::End();
 	}
@@ -99,16 +106,28 @@ void ModuleNetworkingClient::onSocketReceivedData(SOCKET socket, const InputMemo
 	ServerMessage type;
 	packet >> type;
 
-	if (type == ServerMessage::Welcome)
+	if (state == ClientState::Start)
 	{
-		LOG("Welcome received from the server");
+		if (type == ServerMessage::Welcome)
+		{
+			LOG("Welcome received from the server");
+			state = ClientState::Logging;
+		}
+		else if (type == ServerMessage::PlayerNameUnavailable)
+		{
+			LOG("My name is not available");
+			state = ClientState::Stopped;
+			disconnect();
+		}
 	}
-	else if (type == ServerMessage::PlayerNameUnavailable)
+	else if (state == ClientState::Logging)
 	{
-		LOG("My name is not available");
-		state = ClientState::Stopped;
-		disconnect();
+		if (type == ServerMessage::NewMessage) 
+		{
+			//TODO: STORE ALL THE MESSAGES TO SHOW THEM ON IMGUI, AND ADD THE NEW ONE TO THE LIST
+		}
 	}
+	
 }
 
 void ModuleNetworkingClient::onSocketDisconnected(SOCKET socket)
