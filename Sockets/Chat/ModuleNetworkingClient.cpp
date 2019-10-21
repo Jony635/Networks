@@ -79,6 +79,13 @@ bool ModuleNetworkingClient::gui()
 
 		ImGui::Text("%s connected to the server...", playerName.c_str());
 
+		char message[1024] = "";
+		ImVec2 windowPos = ImGui::GetWindowPos();
+		ImGui::SetCursorScreenPos({ ImGui::GetCursorScreenPos().x, windowPos.y + ImGui::GetWindowHeight() - 30});
+		ImGui::AlignTextToFramePadding();
+		ImGui::Text("Message:"); ImGui::SameLine();
+		ImGui::InputText("##MessageInput", message, 1024);
+
 		ImGui::End();
 	}
 
