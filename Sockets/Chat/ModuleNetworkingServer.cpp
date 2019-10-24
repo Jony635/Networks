@@ -183,6 +183,7 @@ void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemo
 			outPacket << ServerMessage::NewMessage;
 			outPacket << msg.playerName;
 			outPacket << msg.message;
+			outPacket << msg.whispered;
 
 			for (auto& connectedSocket : connectedSockets)
 			{
@@ -200,12 +201,102 @@ void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemo
 			{
 				OutputMemoryStream outPacket;
 				outPacket << ServerMessage::ServerGlobalMessage;
-				outPacket << "No commands available, We are sorry";
+				outPacket << "Available Commands:\n/list\n/kick playerName\n/whisper playerName message";
 
 				if (!sendPacket(outPacket, socket))
 				{
 					ELOG("SERVER ERROR: ERROR SENDING /HELP RESPONSE TO THE CONNECTED CLIENT");
 				}
+			}
+			else if (msg.message == "/list")
+			{
+				OutputMemoryStream outPacket;
+				outPacket << ServerMessage::ServerGlobalMessage;
+
+				std::string message = "Connected Users:";
+				for (auto& connectedSocket : connectedSockets)
+				{
+					message += "\n- " + connectedSocket.playerName;
+				}
+				outPacket << message;
+				
+				if (!sendPacket(outPacket, socket))
+				{
+					ELOG("SERVER ERROR: ERROR SENDING /LIST RESPONSE TO THE CONNECTED CLIENT");
+				}
+			}
+			else if (msg.message.find("/kick") != std::string::npos)
+			{
+				std::string playerName = msg.message.substr(msg.message.find("/kick") + 6);
+
+				for (auto& connectedSocket : connectedSockets)
+				{
+					if (connectedSocket.playerName == playerName)
+					{
+						OutputMemoryStream outPacket;
+						outPacket << ServerMessage::Disconnected;
+
+						if (!sendPacket(outPacket, connectedSocket.socket))
+						{
+							ELOG("SERVER ERROR: ERROR SENDING /KICK RESPONSE TO THE CONNECTED CLIENT");
+						}
+
+						onSocketDisconnected(connectedSocket.socket);
+					}
+				}
+			}
+			else if (msg.message.find("/whisper") != std::string::npos)
+			{
+				std::string nameAndMessage = msg.message.substr(msg.message.find("/whisper") + 9);
+
+				int nameEnd = nameAndMessage.find(" ");
+				if (nameEnd != std::string::npos)
+				{
+					std::string name = nameAndMessage.substr(0, nameEnd);
+					std::string message = nameAndMessage.substr(nameEnd+1);
+
+					bool found = false;
+					for (auto& connectedSocket : connectedSockets)
+					{
+						if (connectedSocket.playerName == name)
+						{
+							found = true;
+
+							OutputMemoryStream outPacket;
+							outPacket << ServerMessage::NewMessage;
+							outPacket << msg.playerName;
+							outPacket << message;
+							outPacket << true;
+
+							if (!sendPacket(outPacket, socket))
+							{
+								ELOG("SERVER ERROR: ERROR SENDING /WHISPER RESPONSE TO THE CONNECTED CLIENT");
+							}
+
+							if (connectedSocket.socket != socket)
+							{
+								if (!sendPacket(outPacket, connectedSocket.socket))
+								{
+									ELOG("SERVER ERROR: ERROR SENDING /WHISPER RESPONSE TO THE CONNECTED CLIENT");
+								}
+							}
+						}
+					}
+
+					if (!found)
+					{
+						OutputMemoryStream outPacket;
+						outPacket << ServerMessage::ServerGlobalMessage;
+						outPacket << "USER NOT FOUND";
+
+						if (!sendPacket(outPacket, socket))
+						{
+							ELOG("SERVER ERROR: ERROR SENDING /WHISPER RESPONSE TO THE CONNECTED CLIENT");
+						}
+					}
+
+				}
+
 			}
 			else
 			{
@@ -248,10 +339,8 @@ void ModuleNetworkingServer::onSocketDisconnected(SOCKET socket)
 
 			connectedSockets.erase(it);		
 
-			break;
+			return;
 		}
 	}
-
-
 }
 

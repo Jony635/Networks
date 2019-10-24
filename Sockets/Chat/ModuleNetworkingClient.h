@@ -7,6 +7,7 @@ struct Message
 	std::string playerName;
 	std::string message;
 	bool server = false;
+	bool whispered = false;
 };
 
 class ModuleNetworkingClient : public ModuleNetworking

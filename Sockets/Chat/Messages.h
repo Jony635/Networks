@@ -14,6 +14,7 @@ enum class ServerMessage
 	Welcome,
 	PlayerNameUnavailable,
 	NewMessage,
-	ServerGlobalMessage
+	ServerGlobalMessage,
+	Disconnected
 };
 
