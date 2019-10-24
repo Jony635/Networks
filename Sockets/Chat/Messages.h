@@ -13,6 +13,7 @@ enum class ServerMessage
 {
 	Welcome,
 	PlayerNameUnavailable,
-	NewMessage
+	NewMessage,
+	ServerGlobalMessage
 };
 

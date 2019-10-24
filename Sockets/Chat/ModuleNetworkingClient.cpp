@@ -80,7 +80,10 @@ bool ModuleNetworkingClient::gui()
 
 		for (Message msg : messages)
 		{
-			ImGui::Text("%s: %s", msg.playerName.data(), msg.message.data());
+			if (!msg.server)
+				ImGui::Text("%s: %s", msg.playerName.data(), msg.message.data());
+			else
+				ImGui::TextColored({ 1,1,0,1 }, "\"%s\".", msg.message.data());
 		}
 
 		//MESSAGE SENDING
@@ -141,6 +144,15 @@ void ModuleNetworkingClient::onSocketReceivedData(SOCKET socket, const InputMemo
 			Message msg;
 			packet >> msg.playerName;
 			packet >> msg.message;
+
+			messages.push_back(msg);
+		}
+		else if (type == ServerMessage::ServerGlobalMessage)
+		{
+			Message msg;
+			packet >> msg.message;
+			
+			msg.server = true;
 
 			messages.push_back(msg);
 		}

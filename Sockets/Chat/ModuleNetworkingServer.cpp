@@ -142,6 +142,22 @@ void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemo
 			{
 				connectedSocket.playerName = playerName;
 
+				//Notify everyone a new client has been connected
+				OutputMemoryStream outPacketConnection;
+				outPacketConnection << ServerMessage::ServerGlobalMessage;
+				outPacketConnection << playerName + " joined";
+
+				for (auto& connectedSocketB : connectedSockets)
+				{
+					if (connectedSocketB.socket == socket)
+						continue;
+
+					if (!sendPacket(outPacketConnection, connectedSocketB.socket))
+					{
+						ELOG("SERVER ERROR: ERROR SENDING USER CONNECTED MESSAGE TO THE CONNECTED CLIENTS");
+					}
+				}
+				
 				//Send welcome packet
 				OutputMemoryStream outPacket;
 				outPacket << ServerMessage::Welcome;
@@ -152,6 +168,7 @@ void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemo
 				}
 			}
 		}
+		connectedSockets;
 	}
 	else if (clientMessage == ClientMessage::NewMessage)
 	{
@@ -159,18 +176,48 @@ void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemo
 		packet >> msg.playerName;
 		packet >> msg.message;
 
-		// Send NewMessage Packet to all the connected sockets
-		OutputMemoryStream outPacket;
-		outPacket << ServerMessage::NewMessage;
-		outPacket << msg.playerName;
-		outPacket << msg.message;
-
-		for (auto& connectedSocket : connectedSockets)
+		if (msg.message[0] != '/')
 		{
-			if (!sendPacket(outPacket, connectedSocket.socket))
+			// Send NewMessage Packet to all the connected sockets
+			OutputMemoryStream outPacket;
+			outPacket << ServerMessage::NewMessage;
+			outPacket << msg.playerName;
+			outPacket << msg.message;
+
+			for (auto& connectedSocket : connectedSockets)
 			{
-				ELOG("SERVER ERROR: ERROR SENDING WELCOME MESSAGE TO THE CONNECTED CLIENT");
+				if (!sendPacket(outPacket, connectedSocket.socket))
+				{
+					ELOG("SERVER ERROR: ERROR SENDING NEW MESSAGE TO THE CONNECTED CLIENT");
+				}
 			}
+		}
+		else
+		{
+			//TODO: IMPLEMENT SERVER COMMANDS HERE
+
+			if (msg.message == "/help")
+			{
+				OutputMemoryStream outPacket;
+				outPacket << ServerMessage::ServerGlobalMessage;
+				outPacket << "No commands available, We are sorry";
+
+				if (!sendPacket(outPacket, socket))
+				{
+					ELOG("SERVER ERROR: ERROR SENDING /HELP RESPONSE TO THE CONNECTED CLIENT");
+				}
+			}
+			else
+			{
+				OutputMemoryStream outPacket;
+				outPacket << ServerMessage::ServerGlobalMessage;
+				outPacket << msg.message + " is not an available command";
+
+				if (!sendPacket(outPacket, socket))
+				{
+					ELOG("SERVER ERROR: ERROR SENDING COMMAND ERROR MESSAGE TO THE CONNECTED CLIENT");
+				}
+			}			
 		}
 	}
 }
@@ -183,9 +230,28 @@ void ModuleNetworkingServer::onSocketDisconnected(SOCKET socket)
 		auto &connectedSocket = *it;
 		if (connectedSocket.socket == socket)
 		{
-			connectedSockets.erase(it);
+			//Notify everyone client has been disconnected
+			OutputMemoryStream outPacketConnection;
+			outPacketConnection << ServerMessage::ServerGlobalMessage;
+			outPacketConnection << connectedSocket.playerName + " left";
+
+			for (auto& connectedSocketB : connectedSockets)
+			{
+				if (connectedSocketB.socket == socket)
+					continue;
+
+				if (!sendPacket(outPacketConnection, connectedSocketB.socket))
+				{
+					ELOG("SERVER ERROR: ERROR SENDING USER CONNECTED MESSAGE TO THE CONNECTED CLIENTS");
+				}
+			}
+
+			connectedSockets.erase(it);		
+
 			break;
 		}
 	}
+
+
 }
 
