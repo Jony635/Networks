@@ -153,6 +153,26 @@ void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemo
 			}
 		}
 	}
+	else if (clientMessage == ClientMessage::NewMessage)
+	{
+		Message msg;
+		packet >> msg.playerName;
+		packet >> msg.message;
+
+		// Send NewMessage Packet to all the connected sockets
+		OutputMemoryStream outPacket;
+		outPacket << ServerMessage::NewMessage;
+		outPacket << msg.playerName;
+		outPacket << msg.message;
+
+		for (auto& connectedSocket : connectedSockets)
+		{
+			if (!sendPacket(outPacket, connectedSocket.socket))
+			{
+				ELOG("SERVER ERROR: ERROR SENDING WELCOME MESSAGE TO THE CONNECTED CLIENT");
+			}
+		}
+	}
 }
 
 void ModuleNetworkingServer::onSocketDisconnected(SOCKET socket)

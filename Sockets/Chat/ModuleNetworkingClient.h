@@ -2,6 +2,12 @@
 
 #include "ModuleNetworking.h"
 
+struct Message
+{
+	std::string playerName;
+	std::string message;
+};
+
 class ModuleNetworkingClient : public ModuleNetworking
 {
 public:
@@ -14,8 +20,6 @@ public:
 
 	bool isRunning() const;
 
-
-
 private:
 
 	//////////////////////////////////////////////////////////////////////
@@ -26,8 +30,6 @@ private:
 
 	bool gui() override;
 
-
-
 	//////////////////////////////////////////////////////////////////////
 	// ModuleNetworking virtual methods
 	//////////////////////////////////////////////////////////////////////
@@ -35,7 +37,6 @@ private:
 	void onSocketReceivedData(SOCKET socket, const InputMemoryStream& packet) override;
 
 	void onSocketDisconnected(SOCKET socket) override;
-
 
 
 	//////////////////////////////////////////////////////////////////////
@@ -55,5 +56,7 @@ private:
 	SOCKET clientSocket = INVALID_SOCKET;
 
 	std::string playerName;
+
+	std::vector<Message> messages;
 };
 

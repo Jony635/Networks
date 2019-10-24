@@ -78,6 +78,11 @@ bool ModuleNetworkingClient::gui()
 
 		ImGui::Text("%s connected to the server...", playerName.c_str());
 
+		for (Message msg : messages)
+		{
+			ImGui::Text("%s: %s", msg.playerName.data(), msg.message.data());
+		}
+
 		//MESSAGE SENDING
 		char message[1024] = "";
 		ImVec2 windowPos = ImGui::GetWindowPos();
@@ -86,11 +91,20 @@ bool ModuleNetworkingClient::gui()
 		ImGui::Text("Message:"); ImGui::SameLine();
 		if (ImGui::InputText("##MessageInput", message, 1024, ImGuiInputTextFlags_::ImGuiInputTextFlags_EnterReturnsTrue))
 		{
+			Message msg;
+			msg.message = message;
+			msg.playerName = playerName;
+
 			//SEND THE MESSAGE TO THE SERVER
 			OutputMemoryStream packet;
 			packet << ClientMessage::NewMessage;
-			packet << message;
+			packet << msg.playerName;
+			packet << msg.message;
+
 			sendPacket(packet, clientSocket);
+
+			//To keep the input text focused after sending the message
+			ImGui::SetKeyboardFocusHere(-1);
 		}
 
 		ImGui::End();
@@ -124,7 +138,11 @@ void ModuleNetworkingClient::onSocketReceivedData(SOCKET socket, const InputMemo
 	{
 		if (type == ServerMessage::NewMessage) 
 		{
-			//TODO: STORE ALL THE MESSAGES TO SHOW THEM ON IMGUI, AND ADD THE NEW ONE TO THE LIST
+			Message msg;
+			packet >> msg.playerName;
+			packet >> msg.message;
+
+			messages.push_back(msg);
 		}
 	}
 	
