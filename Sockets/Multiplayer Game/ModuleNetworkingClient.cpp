@@ -154,6 +154,7 @@ void ModuleNetworkingClient::onUpdate()
 	else if (state == ClientState::Playing)
 	{
 		secondsSinceLastInputDelivery += Time.deltaTime;
+		secondsSinceLastPing += Time.deltaTime;
 
 		if (inputDataBack - inputDataFront < ArrayCount(inputData))
 		{
@@ -193,6 +194,15 @@ void ModuleNetworkingClient::onUpdate()
 		{
 			//Disconnect the client
 			disconnect();
+		}
+
+		if (secondsSinceLastPing >= PING_INTERVAL_SECONDS)
+		{
+			secondsSinceLastPing = 0.0f;
+			
+			OutputMemoryStream packet;
+			packet << ClientMessage::Ping;
+			sendPacket(packet, serverAddress);
 		}
 	}
 
