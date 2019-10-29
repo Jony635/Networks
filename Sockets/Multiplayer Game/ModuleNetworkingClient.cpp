@@ -187,6 +187,13 @@ void ModuleNetworkingClient::onUpdate()
 				sendPacket(packet, serverAddress);
 			}
 		}
+
+		//Disconnect the client if the time since the last received packet is greater than DISCONNECT_TIMEOUT_SECONDS
+		if (Time.time - lastPacketReceivedTime >= DISCONNECT_TIMEOUT_SECONDS)
+		{
+			//Disconnect the client
+			disconnect();
+		}
 	}
 
 	// Make the camera focus the player game object
