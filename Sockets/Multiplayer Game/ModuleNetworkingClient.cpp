@@ -196,6 +196,7 @@ void ModuleNetworkingClient::onUpdate()
 			disconnect();
 		}
 
+		//Send regular pings to the server
 		if (secondsSinceLastPing >= PING_INTERVAL_SECONDS)
 		{
 			secondsSinceLastPing = 0.0f;
