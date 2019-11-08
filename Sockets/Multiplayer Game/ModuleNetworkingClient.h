@@ -75,6 +75,7 @@ private:
 	float inputDeliveryIntervalSeconds = 0.05f;
 	float secondsSinceLastInputDelivery = 0.0f;
 
+	ReplicationManagerClient repManager;
 
 	// Timeout / ping
 
