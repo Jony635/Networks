@@ -3,7 +3,7 @@
 
 void ReplicationManagerClient::read(const InputMemoryStream& packet)
 {
-	while (packet.GetSize() > 0)
+	while (packet.RemainingByteCount() > 0)
 	{
 		uint32 networkId;
 		packet >> networkId;
@@ -66,8 +66,10 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet)
 			case ReplicationAction::Destroy:
 			{
 				GameObject* gameObject = App->modLinkingContext->getNetworkGameObject(networkId);
+
 				if (gameObject)
 				{
+					App->modLinkingContext->unregisterNetworkGameObject(gameObject);
 					Destroy(gameObject);
 				}
 				break;

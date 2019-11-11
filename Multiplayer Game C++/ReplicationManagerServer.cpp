@@ -6,7 +6,8 @@ void ReplicationManagerServer::create(uint32 networkId)
 	command.action = ReplicationAction::Create;
 	command.networkId = networkId;
 
-	map.insert(std::pair<uint32, ReplicationCommand>(networkId, command));
+	if(map.find(networkId) == map.end())
+		map[networkId] = command;
 }
 
 void ReplicationManagerServer::update(uint32 networkId)
@@ -15,7 +16,8 @@ void ReplicationManagerServer::update(uint32 networkId)
 	command.action = ReplicationAction::Update;
 	command.networkId = networkId;
 
-	map.insert(std::pair<uint32, ReplicationCommand>(networkId, command));
+	if (map.find(networkId) == map.end())
+		map[networkId] = command;
 }
 
 void ReplicationManagerServer::destroy(uint32 networkId)
@@ -24,7 +26,8 @@ void ReplicationManagerServer::destroy(uint32 networkId)
 	command.action = ReplicationAction::Destroy;
 	command.networkId = networkId;
 
-	map.insert(std::pair<uint32, ReplicationCommand>(networkId, command));
+	//Destroy has preference
+	map[networkId] = command;
 }
 
 void ReplicationManagerServer::write(OutputMemoryStream& packet)
@@ -44,15 +47,18 @@ void ReplicationManagerServer::write(OutputMemoryStream& packet)
 				//Get the object from LinkingContext
 				GameObject* gameObject = App->modLinkingContext->getNetworkGameObject(command.networkId);
 
-				//Serialize fields
-				packet << gameObject->position.x;
-				packet << gameObject->position.y;
-				packet << gameObject->angle;
-				packet << gameObject->color.r;
-				packet << gameObject->color.g;
-				packet << gameObject->color.b;
-				packet << gameObject->color.a;
-
+				if (gameObject)
+				{
+					//Serialize fields
+					packet << gameObject->position.x;
+					packet << gameObject->position.y;
+					packet << gameObject->angle;
+					packet << gameObject->color.r;
+					packet << gameObject->color.g;
+					packet << gameObject->color.b;
+					packet << gameObject->color.a;
+				}
+				
 				break;
 			}
 
@@ -61,14 +67,18 @@ void ReplicationManagerServer::write(OutputMemoryStream& packet)
 				//Get the object from LinkingContext
 				GameObject* gameObject = App->modLinkingContext->getNetworkGameObject(command.networkId);
 
-				//Serialize fields
-				packet << gameObject->position.x;
-				packet << gameObject->position.y;
-				packet << gameObject->angle;
-				packet << gameObject->color.r;
-				packet << gameObject->color.g;
-				packet << gameObject->color.b;
-				packet << gameObject->color.a;
+				if (gameObject)
+				{
+					//Serialize fields
+					packet << gameObject->position.x;
+					packet << gameObject->position.y;
+					packet << gameObject->angle;
+					packet << gameObject->color.r;
+					packet << gameObject->color.g;
+					packet << gameObject->color.b;
+					packet << gameObject->color.a;
+				}
+
 				break;
 			}
 		}	
