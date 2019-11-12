@@ -52,11 +52,25 @@ void ReplicationManagerServer::write(OutputMemoryStream& packet)
 					//Serialize fields
 					packet << gameObject->position.x;
 					packet << gameObject->position.y;
+
 					packet << gameObject->angle;
+
 					packet << gameObject->color.r;
 					packet << gameObject->color.g;
 					packet << gameObject->color.b;
 					packet << gameObject->color.a;
+
+					packet << gameObject->size.x;
+					packet << gameObject->size.y;
+
+					if (gameObject->texture == App->modResources->spacecraft1)
+						packet << (uint8)1;
+					else if (gameObject->texture == App->modResources->spacecraft2)
+						packet << (uint8)2;
+					else if (gameObject->texture == App->modResources->spacecraft3)
+						packet << (uint8)3;
+					else
+						packet << (uint8)0;
 				}
 				
 				break;

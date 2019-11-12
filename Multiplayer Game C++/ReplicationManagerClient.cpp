@@ -18,14 +18,23 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet)
 				vec2 position;
 				float angle;
 				vec4 color;
+				vec2 size;
+				uint8 spaceShipType;
 
 				packet >> position.x;
 				packet >> position.y;
+
 				packet >> angle;
+
 				packet >> color.r;
 				packet >> color.g;
 				packet >> color.b;
 				packet >> color.a;
+
+				packet >> size.x;
+				packet >> size.y;
+
+				packet >> spaceShipType;
 
 				GameObject* gameObject = Instantiate();
 				if (gameObject)
@@ -33,6 +42,31 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet)
 					gameObject->position = position;
 					gameObject->angle = angle;
 					gameObject->color = color;
+					gameObject->size = size;
+		
+					switch (spaceShipType)
+					{
+						case 0:
+							gameObject->texture = App->modResources->laser;
+							break;
+						case 1:
+							gameObject->texture = App->modResources->spacecraft1;
+							break;
+						case 2:
+							gameObject->texture = App->modResources->spacecraft2;
+							break;
+						case 3:
+							gameObject->texture = App->modResources->spacecraft3;
+							break;
+					}
+
+					// Create collider
+					gameObject->collider = App->modCollision->addCollider(ColliderType::Player, gameObject);
+					gameObject->collider->isTrigger = true;
+
+					// Create behaviour
+					gameObject->behaviour = new Spaceship;
+					gameObject->behaviour->gameObject = gameObject;
 
 					App->modLinkingContext->registerNetworkGameObjectWithNetworkId(gameObject, networkId);
 				}
