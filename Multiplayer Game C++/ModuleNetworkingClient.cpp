@@ -128,8 +128,12 @@ void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream &packet, c
 	else if (state == ClientState::Playing)
 	{
 		//Handle incoming messages from servers
-		if(message == ServerMessage::Replication)	
+		if (message == ServerMessage::Replication)
+		{
 			repManager.read(packet);
+
+			packet >> inputDataFront;
+		}
 	}
 }
 
@@ -185,7 +189,7 @@ void ModuleNetworkingClient::onUpdate()
 				}
 
 				// Clear the queue
-				inputDataFront = inputDataBack;
+				//inputDataFront = inputDataBack;
 
 				sendPacket(packet, serverAddress);
 			}

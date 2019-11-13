@@ -1,8 +1,6 @@
 #include "Networks.h"
 #include "ModuleNetworkingServer.h"
 
-
-
 //////////////////////////////////////////////////////////////////////
 // ModuleNetworkingServer public methods
 //////////////////////////////////////////////////////////////////////
@@ -11,8 +9,6 @@ void ModuleNetworkingServer::setListenPort(int port)
 {
 	listenPort = port;
 }
-
-
 
 //////////////////////////////////////////////////////////////////////
 // ModuleNetworking virtual methods
@@ -213,12 +209,15 @@ void ModuleNetworkingServer::onUpdate()
 				//TODO(jesus): If the replication interval passed and the replication manager of this proxy
 				//             has pending data, write and send a replication packet to this client.
 
-				if (replicationDeliveryTimer >= replicationDeliveryIntervalSeconds && clientProxy.repManager.hasPendingData())
+				if (replicationDeliveryTimer >= replicationDeliveryIntervalSeconds)
 				{
 					OutputMemoryStream packet;
 					packet << ServerMessage::Replication;
 
 					clientProxy.repManager.write(packet);
+
+					packet << clientProxy.nextExpectedInputSequenceNumber;
+
 					sendPacket(packet, clientProxy.address);
 				}
 			}
@@ -286,7 +285,6 @@ void ModuleNetworkingServer::onDisconnect()
 
 	state = ServerState::Stopped;
 }
-
 
 
 //////////////////////////////////////////////////////////////////////
