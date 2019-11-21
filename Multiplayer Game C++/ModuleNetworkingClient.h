@@ -76,6 +76,7 @@ private:
 	float secondsSinceLastInputDelivery = 0.0f;
 
 	ReplicationManagerClient repManager;
+	DeliveryManager delManager;
 
 	// Timeout / ping
 
