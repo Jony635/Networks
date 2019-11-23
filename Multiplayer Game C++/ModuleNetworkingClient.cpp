@@ -130,7 +130,15 @@ void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream &packet, c
 		//Handle incoming messages from servers
 		if (message == ServerMessage::Replication)
 		{
-			repManager.read(packet);
+			if(delManager.processSequenceNumber(packet))
+				repManager.read(packet);
+
+			else //Empty the packet without reading the content
+			{
+				char temp;
+				while (packet.RemainingByteCount() > sizeof(uint32))
+					packet >> temp;
+			}
 
 			packet >> inputDataFront;
 		}
@@ -209,6 +217,9 @@ void ModuleNetworkingClient::onUpdate()
 			
 			OutputMemoryStream packet;
 			packet << ClientMessage::Ping;
+
+			delManager.writeSequenceNumbersPendingAck(packet);		
+
 			sendPacket(packet, serverAddress);
 		}
 	}

@@ -174,7 +174,10 @@ void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream &packet, c
 				}
 			}
 		}
-
+		else if (message == ClientMessage::Ping && proxy)
+		{
+			proxy->delManager.processAckdSequenceNumbers(packet);
+		}
 		if (proxy != nullptr)
 		{
 			proxy->lastPacketReceivedTime = Time.time;
@@ -213,6 +216,7 @@ void ModuleNetworkingServer::onUpdate()
 				{
 					OutputMemoryStream packet;
 					packet << ServerMessage::Replication;
+					clientProxy.delManager.writeSequenceNumber(packet);
 
 					clientProxy.repManager.write(packet);
 
@@ -220,6 +224,8 @@ void ModuleNetworkingServer::onUpdate()
 
 					sendPacket(packet, clientProxy.address);
 				}
+
+				clientProxy.delManager.processTimedOutPackets();
 			}
 		}	
 		
