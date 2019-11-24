@@ -26,18 +26,23 @@ struct Spaceship : public Behaviour
 		{
 			const float rotateSpeed = 180.0f;
 			gameObject->angle += input.horizontalAxis * rotateSpeed * Time.deltaTime;
-			NetworkUpdate(gameObject);
+
+			if(!App->modNetClient->isConnected())
+				NetworkUpdate(gameObject);
 		}
 
 		if (input.actionDown == ButtonState::Pressed)
 		{
 			const float advanceSpeed = 200.0f;
 			gameObject->position += vec2FromDegrees(gameObject->angle) * advanceSpeed * Time.deltaTime;
-			NetworkUpdate(gameObject);
+			if (!App->modNetClient->isConnected())
+				NetworkUpdate(gameObject);
 		}
 
-		if (input.actionLeft == ButtonState::Press)
+		if (input.actionLeft == ButtonState::Press && !App->modNetClient->isConnected())
 		{
+			//Only spawn bullets if it is the server who is processing inputs. Otherwise the structure will be completely broken.
+			//TODO: TRY TO FIX THIS IN ORDER TO MAKE THE BULLETS NOT SO LAGGY.
 			GameObject * laser = App->modNetServer->spawnBullet(gameObject);
 			laser->tag = gameObject->tag;
 		}
@@ -68,7 +73,8 @@ struct Laser : public Behaviour
 
 		secondsSinceCreation += Time.deltaTime;
 
-		NetworkUpdate(gameObject);
+		if(!App->modNetClient->isConnected())
+			NetworkUpdate(gameObject);
 
 		const float lifetimeSeconds = 2.0f;
 		if (secondsSinceCreation > lifetimeSeconds) NetworkDestroy(gameObject);

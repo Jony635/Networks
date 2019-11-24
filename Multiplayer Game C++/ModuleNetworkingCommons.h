@@ -12,4 +12,4 @@ uint16 packInputControllerButtons(const InputController &input);
 
 void unpackInputControllerButtons(uint16 buttonBits, InputController &input);
 
-InputController inputControllerFromInputPacketData(const InputPacketData& inputPacketData, const InputController& previousGamepad);
+InputController inputControllerFromInputPacketData(const InputPacketData& inputPacketData);

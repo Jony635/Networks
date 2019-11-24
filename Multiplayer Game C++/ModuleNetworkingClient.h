@@ -14,8 +14,6 @@ public:
 
 	void setPlayerInfo(const char *playerName, uint8 spaceshipType);
 
-
-
 private:
 
 	//////////////////////////////////////////////////////////////////////

@@ -141,6 +141,22 @@ void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream &packet, c
 			}
 
 			packet >> inputDataFront;
+
+			//REAPPLY THE INPUTS NOT PROCESSED BY THE SERVER YET, AFTER THE REPLICATION PROCESS FINISHES.
+			//The previous input processed by the server is inputDataFront - 1
+			//from inputDataFront to inputDataBack apply all inputs to our gameObject.
+
+			GameObject* playerGameObject = App->modLinkingContext->getNetworkGameObject(networkId);
+			if (playerGameObject != nullptr)
+			{
+				for (int i = inputDataFront; i != inputDataBack; ++i)
+				{
+					InputPacketData inputPacketData = inputData[i];
+					InputController inputController = inputControllerFromInputPacketData(inputPacketData);
+
+					playerGameObject->behaviour->onInput(Input);
+				}
+			}	
 		}
 	}
 }
@@ -178,6 +194,13 @@ void ModuleNetworkingClient::onUpdate()
 			inputPacketData.horizontalAxis = Input.horizontalAxis;
 			inputPacketData.verticalAxis = Input.verticalAxis;
 			inputPacketData.buttonBits = packInputControllerButtons(Input);
+
+			//Process the new input: Client Side
+			GameObject* playerGameObject = App->modLinkingContext->getNetworkGameObject(networkId);
+			if (playerGameObject != nullptr)
+			{
+				playerGameObject->behaviour->onInput(Input);
+			}
 
 			// Create packet (if there's input and the input delivery interval exceeded)
 			if (secondsSinceLastInputDelivery > inputDeliveryIntervalSeconds)
