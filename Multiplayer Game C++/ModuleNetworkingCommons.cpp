@@ -1,4 +1,5 @@
 #include "Networks.h"
+#include "ModuleNetworkingCommons.h"
 
 uint16 packInputControllerButtons(const InputController & input)
 {
@@ -52,4 +53,14 @@ void unpackInputControllerButtons(uint16 buttonBits, InputController & input)
 		buttonState = transition[wasPressed][isPressed];
 		buttonIndex++;
 	}
+}
+
+InputController inputControllerFromInputPacketData(const InputPacketData& inputPacketData, const InputController& previousGamepad)
+{
+	InputController inputController;
+	inputController.horizontalAxis = inputPacketData.horizontalAxis;
+	inputController.verticalAxis = inputPacketData.verticalAxis;
+	unpackInputControllerButtons(inputPacketData.buttonBits, inputController);
+
+	return inputController;
 }
