@@ -457,9 +457,8 @@ void NetworkUpdate(GameObject * gameObject)
 	App->modNetServer->updateNetworkObject(gameObject);
 }
 
-void NetworkDestroy(GameObject * gameObject)
+void NetworkDestroy(GameObject* gameObject)
 {
 	ASSERT(App->modNetServer->isConnected());
-
 	App->modNetServer->destroyNetworkObject(gameObject);
 }

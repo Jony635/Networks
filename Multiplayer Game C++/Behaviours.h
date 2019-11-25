@@ -50,7 +50,7 @@ struct Spaceship : public Behaviour
 
 	void onCollisionTriggered(Collider &c1, Collider &c2) override
 	{
-		if (c2.type == ColliderType::Laser && c2.gameObject->tag != gameObject->tag)
+		if (!App->modNetClient->isConnected() && c2.type == ColliderType::Laser && c2.gameObject->tag != gameObject->tag)
 		{
 			NetworkDestroy(c2.gameObject); // Destroy the laser
 

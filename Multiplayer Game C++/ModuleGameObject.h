@@ -28,7 +28,16 @@ struct GameObject
 
 	// Tag for custom usage
 	uint32 tag = 0;
-	
+
+	//For entity interpolation
+	vec2 initial_position = {.0f, .0f};
+	float initial_angle = .0f;
+
+	vec2 final_position = {.0f, .0f};
+	float final_angle = .0f;
+
+	float secondsElapsed = -1.0f;
+
 private:
 
 	void * operator new(size_t size) = delete;
@@ -57,6 +66,10 @@ public:
 	static GameObject * Instantiate();
 
 	static void Destroy(GameObject * gameObject);
+
+	//DEFAULT INTERPOLATION TIME: 200MS
+	static vec2 Interpolate(vec2& initial, vec2& final, float timeElapsed);
+	static float Interpolate(float initial, float final, float timeElapsed);
 
 	GameObject gameObjects[MAX_GAME_OBJECTS] = {};
 };

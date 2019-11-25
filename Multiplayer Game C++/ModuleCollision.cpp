@@ -129,11 +129,13 @@ bool ModuleCollision::update()
 						{
 							if (c1.isTrigger)
 							{
-								c1.gameObject->behaviour->onCollisionTriggered(c1, c2);
+								if(c1.gameObject->behaviour)
+									c1.gameObject->behaviour->onCollisionTriggered(c1, c2);
 							}
 							if (c2.isTrigger)
 							{
-								c2.gameObject->behaviour->onCollisionTriggered(c2, c1);
+								if (c2.gameObject->behaviour)
+									c2.gameObject->behaviour->onCollisionTriggered(c2, c1);
 							}
 						}
 					}

@@ -60,13 +60,26 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet)
 							break;
 					}
 
-					// Create collider
-					gameObject->collider = App->modCollision->addCollider(ColliderType::Player, gameObject);
-					gameObject->collider->isTrigger = true;
+					if (spaceShipType != 0)
+					{
+						// Create collider
+						gameObject->collider = App->modCollision->addCollider(ColliderType::Player, gameObject);
+						gameObject->collider->isTrigger = true;
 
-					// Create behaviour
-					gameObject->behaviour = new Spaceship;
-					gameObject->behaviour->gameObject = gameObject;
+						// Create behaviour
+						gameObject->behaviour = new Spaceship;
+						gameObject->behaviour->gameObject = gameObject;
+					}
+					else
+					{
+						// Create collider
+						gameObject->collider = App->modCollision->addCollider(ColliderType::Laser, gameObject);
+						gameObject->collider->isTrigger = true;
+
+						// Create behaviour
+						/*gameObject->behaviour = new Laser();
+						gameObject->behaviour->gameObject = gameObject;*/
+					}
 
 					App->modLinkingContext->registerNetworkGameObjectWithNetworkId(gameObject, networkId);
 				}
@@ -90,9 +103,21 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet)
 				GameObject* gameObject = App->modLinkingContext->getNetworkGameObject(networkId);
 				if (gameObject)
 				{
-					gameObject->position = position;
-					gameObject->angle = angle;
-					gameObject->color = color;
+					if (networkId == App->modNetClient->getPlayerNetworkID())
+					{
+						gameObject->position = position;
+						gameObject->angle = angle;
+
+						continue;
+					}
+					
+					gameObject->initial_position = gameObject->position;
+					gameObject->initial_angle = gameObject->angle;
+
+					gameObject->final_position = position;
+					gameObject->final_angle = angle;
+
+					gameObject->secondsElapsed = .0f;
 				}
 
 				break;
