@@ -143,6 +143,13 @@ bool ModuleNetworking::update()
 
 bool ModuleNetworking::gui()
 {
+	if (App->modNetClient->isEnabled())
+	{
+		GameObject* playerGameObject = App->modLinkingContext->getNetworkGameObject(App->modNetClient->networkId);
+
+		if (playerGameObject != nullptr && !playerGameObject->enabled) return true;
+	}
+
 	if (isConnected())
 	{
 		ImGui::Begin("ModuleNetworking window");

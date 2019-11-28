@@ -4,6 +4,9 @@
 
 class ModuleNetworkingClient : public ModuleNetworking
 {
+	friend class ModuleNetworking;
+	friend class ModuleUI;
+
 public:
 
 	//////////////////////////////////////////////////////////////////////

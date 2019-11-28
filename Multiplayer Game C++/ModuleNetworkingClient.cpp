@@ -60,6 +60,10 @@ void ModuleNetworkingClient::onStart()
 
 void ModuleNetworkingClient::onGui()
 {
+	GameObject* playerGameObject = App->modLinkingContext->getNetworkGameObject(networkId);
+
+	if (playerGameObject != nullptr && !playerGameObject->enabled) return;
+
 	if (state == ClientState::Stopped) return;
 
 	if (ImGui::CollapsingHeader("ModuleNetworkingClient", ImGuiTreeNodeFlags_DefaultOpen))

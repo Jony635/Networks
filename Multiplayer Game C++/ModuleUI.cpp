@@ -36,6 +36,13 @@ bool ModuleUI::preUpdate()
 
 bool ModuleUI::gui()
 {
+	if (App->modNetClient->isEnabled())
+	{
+		GameObject* playerGameObject = App->modLinkingContext->getNetworkGameObject(App->modNetClient->networkId);
+
+		if (playerGameObject != nullptr && !playerGameObject->enabled) return true;
+	}
+
 	ImGui::Begin("Log");
 
 	uint32 logEntryCount = getLogEntryCount();
