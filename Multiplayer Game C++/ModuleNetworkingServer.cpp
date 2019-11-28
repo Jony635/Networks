@@ -419,6 +419,12 @@ GameObject * ModuleNetworkingServer::spawnBullet(GameObject *parent)
 }
 
 
+void ModuleNetworkingServer::SpaceShipDestroy(GameObject *spaceShip)
+{
+	spaceShip->enabled = false;
+}
+
+
 //////////////////////////////////////////////////////////////////////
 // Update / destruction
 //////////////////////////////////////////////////////////////////////

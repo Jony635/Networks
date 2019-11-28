@@ -447,6 +447,9 @@ void ModuleRender::renderScene()
 	{
 		GameObject *gameObject = orderedGameObjects[i];
 
+		if (!gameObject->enabled)
+			continue;
+
 		// Setup matrices into our constant buffer
 		{
 			// Projection matrix
@@ -501,6 +504,8 @@ void ModuleRender::renderScene()
 		{
 			Collider *collider = App->modCollision->activeColliders[i];
 			if (collider == nullptr) continue;
+
+			if (!collider->gameObject->enabled) continue;
 
 			if (collider->type != ColliderType::None && collider->gameObject != nullptr)
 			{

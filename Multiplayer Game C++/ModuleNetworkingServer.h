@@ -34,8 +34,6 @@ private:
 
 	void onDisconnect() override;
 
-
-
 	//////////////////////////////////////////////////////////////////////
 	// Client proxies
 	//////////////////////////////////////////////////////////////////////
@@ -83,7 +81,7 @@ public:
 
 	// NOTE(jesus): Here go spawn methods for each type of network objects
 
-
+	void SpaceShipDestroy(GameObject *spaceShip);
 
 private:
 

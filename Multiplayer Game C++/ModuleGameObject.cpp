@@ -34,7 +34,7 @@ bool ModuleGameObject::preUpdate()
 		}
 		else if (gameObject.state == GameObject::CREATING)
 		{
-			if (gameObject.behaviour != nullptr)
+			if (gameObject.behaviour != nullptr && gameObject.enabled)
 				gameObject.behaviour->start();
 			gameObject.state = GameObject::UPDATING;
 		}
@@ -72,7 +72,7 @@ bool ModuleGameObject::update()
 	{
 		if (gameObject.state == GameObject::UPDATING)
 		{
-			if (gameObject.behaviour != nullptr)
+			if (gameObject.behaviour != nullptr && gameObject.enabled)
 				gameObject.behaviour->update();
 		}
 	}

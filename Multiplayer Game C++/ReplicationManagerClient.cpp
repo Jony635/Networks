@@ -120,6 +120,7 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet)
 					gameObject->final_angle = angle;
 
 					gameObject->secondsElapsed = .0f;
+
 				}
 
 				break;

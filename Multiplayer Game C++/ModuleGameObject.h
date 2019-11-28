@@ -38,6 +38,9 @@ struct GameObject
 
 	float secondsElapsed = -1.0f;
 
+	//Enable / disable
+	bool enabled = true;
+
 private:
 
 	void * operator new(size_t size) = delete;

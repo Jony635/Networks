@@ -10,7 +10,7 @@ struct Behaviour
 
 	virtual void onInput(const InputController &input) { }
 
-	virtual void onCollisionTriggered(Collider &c1, Collider &c2) { }
+	virtual void onCollisionTriggered(Collider &c1, Collider &c2) {}
 };
 
 struct Spaceship : public Behaviour
@@ -57,6 +57,8 @@ struct Spaceship : public Behaviour
 			// Be careful, if you do NetworkDestroy(gameObject) directly,
 			// the client proxy will poing to an invalid gameObject...
 			// instead, make the gameObject invisible or disconnect the client.
+
+			App->modNetServer->SpaceShipDestroy(c1.gameObject);
 		}
 	}
 };
