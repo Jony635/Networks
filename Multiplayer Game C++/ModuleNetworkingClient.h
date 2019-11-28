@@ -62,6 +62,8 @@ private:
 	uint32 playerId = 0;
 	uint32 networkId = 0;
 
+	//Game related stuff
+	uint32 points = 0u;
 
 	// Input ///////////
 

@@ -445,6 +445,27 @@ void ModuleNetworkingServer::updateNetworkObject(GameObject * gameObject)
 	}
 }
 
+void ModuleNetworkingServer::SortProxies()
+{
+	bool swapped = true;
+	while (swapped)
+	{
+		swapped = false;
+
+		for (int i = 0; i < MAX_CLIENTS - 1; ++i)
+		{
+			if (clientProxies[i].points < clientProxies[i + 1].points)
+			{
+				ClientProxy a = clientProxies[i];
+				clientProxies[i] = clientProxies[i + 1];
+				clientProxies[i + 1] = a;
+				
+				swapped = true;
+			}
+		}
+	}
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // Global update / destruction of game objects

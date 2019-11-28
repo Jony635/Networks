@@ -57,6 +57,8 @@ private:
 
 		ReplicationManagerServer repManager;
 		DeliveryManager delManager;
+		
+		uint32 points = 0u;
 	};
 
 	ClientProxy clientProxies[MAX_CLIENTS];
@@ -95,7 +97,7 @@ private:
 	void updateNetworkObject(GameObject *gameObject);
 	friend void (NetworkUpdate)(GameObject *);
 
-
+	void SortProxies();
 
 	//////////////////////////////////////////////////////////////////////
 	// State
