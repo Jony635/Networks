@@ -147,7 +147,23 @@ bool ModuleNetworking::gui()
 	{
 		GameObject* playerGameObject = App->modLinkingContext->getNetworkGameObject(App->modNetClient->networkId);
 
-		if (playerGameObject != nullptr && !playerGameObject->enabled) return true;
+		if (playerGameObject != nullptr && !playerGameObject->enabled)
+		{
+			ImGui::Begin("GAME OVER");
+
+			if (ImGui::Button("Disconnect")) {
+				disconnect();
+			}
+			ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.45f);
+
+			onGui();
+
+			ImGui::PopItemWidth();
+
+			ImGui::End();
+
+			return true;
+		}
 	}
 
 	if (isConnected())
