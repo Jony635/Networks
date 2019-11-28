@@ -1,6 +1,7 @@
 #pragma once
 
 #define SIMULATE_REAL_WORLD_CONDITIONS
+#define DEATH_TIME 5.0f
 
 class ModuleNetworking : public Module
 {
@@ -14,7 +15,11 @@ public:
 
 	void disconnect();
 
+public:
 
+	//Death time counter
+
+	float deathTimer = 0.0f;
 
 protected:
 

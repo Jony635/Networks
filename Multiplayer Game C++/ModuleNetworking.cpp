@@ -162,6 +162,13 @@ bool ModuleNetworking::gui()
 
 			ImGui::End();
 
+			if (deathTimer >= DEATH_TIME)
+			{
+				deathTimer = 0.0f;
+				disconnect();
+			}
+			else deathTimer += 0.01; //Don't know where is DT...
+
 			return true;
 		}
 	}
