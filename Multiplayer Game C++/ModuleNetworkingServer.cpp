@@ -240,6 +240,14 @@ void ModuleNetworkingServer::onUpdate()
 			replicationDeliveryTimer = 0.0f;
 
 		replicationDeliveryTimer += Time.deltaTime;
+
+		//ScoreList Timers
+		updateScoreListTimer *= Time.deltaTime;
+		if (updateScoreListTimer >= updateScoreListIntervalSeconds)
+		{
+			updateScoreListTimer = 0.0f;
+			UpdateScoreLists();
+		}
 	}
 }
 
@@ -445,27 +453,71 @@ void ModuleNetworkingServer::updateNetworkObject(GameObject * gameObject)
 	}
 }
 
-void ModuleNetworkingServer::SortProxies()
+bool ModuleNetworkingServer::SortProxies()
 {
 	bool swapped = true;
+	bool somethingChanged = false;
 	while (swapped)
 	{
 		swapped = false;
 
 		for (int i = 0; i < MAX_CLIENTS - 1; ++i)
 		{
-			if (clientProxies[i].points < clientProxies[i + 1].points)
+			//Sort by:
+			// - Connected with more points before.
+			// - Connected with less points after.
+			// - Disconnected at the end.
+
+			if ((!clientProxies[i].connected && clientProxies[i + 1].connected) ||
+				(clientProxies[i].points < clientProxies[i + 1].points))
 			{
 				ClientProxy a = clientProxies[i];
 				clientProxies[i] = clientProxies[i + 1];
 				clientProxies[i + 1] = a;
-				
+
 				swapped = true;
-			}
+				somethingChanged = true;
+			}			
 		}
 	}
+
+	return somethingChanged;
 }
 
+void ModuleNetworkingServer::UpdateScoreLists()
+{
+	//If there are no score differences just skip.
+	if (!SortProxies())
+		return;
+
+	for (int i = 0; i < MAX_CLIENTS; ++i)
+	{
+		ClientProxy& client = clientProxies[i];
+
+		if (!client.connected)
+			return; //All the other proxies are disconnected, because of they are sorted.
+
+		ClientProxy* clientBefore = nullptr;
+		ClientProxy* clientAfter = nullptr;
+
+		if (i != 0)
+			clientBefore = &clientProxies[i - 1];
+
+		if (i != MAX_CLIENTS - 1)
+			clientAfter = &clientProxies[i + 1];
+
+		OutputMemoryStream packet;
+		packet << ServerMessage::ScoreListUpdate;
+
+		packet << (clientBefore ? clientBefore->name : "");
+		packet << (clientBefore ? clientBefore->points : 0u);
+
+		packet << (clientAfter ? clientAfter->name : "");
+		packet << (clientAfter ? clientAfter->points : 0u);
+
+		sendPacket(packet, client.address);
+	}
+}
 
 //////////////////////////////////////////////////////////////////////
 // Global update / destruction of game objects

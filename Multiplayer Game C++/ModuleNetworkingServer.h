@@ -97,7 +97,8 @@ private:
 	void updateNetworkObject(GameObject *gameObject);
 	friend void (NetworkUpdate)(GameObject *);
 
-	void SortProxies();
+	bool SortProxies();
+	void UpdateScoreLists();
 
 	//////////////////////////////////////////////////////////////////////
 	// State
@@ -117,6 +118,10 @@ private:
 	
 	float replicationDeliveryIntervalSeconds = 0.1f;
 	float replicationDeliveryTimer = 0.0f;
+
+	//ScoreList Timers
+	float updateScoreListIntervalSeconds = 0.5f;
+	float updateScoreListTimer = 0.0f;
 };
 
 
