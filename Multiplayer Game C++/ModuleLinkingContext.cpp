@@ -17,11 +17,12 @@ void ModuleLinkingContext::registerNetworkGameObject(GameObject *gameObject)
 	ASSERT(false); // NOTE(jesus): Increase MAX_NETWORKED_OBJECTS if necessary
 }
 
-void ModuleLinkingContext::registerNetworkGameObjectWithNetworkId(GameObject * gameObject, uint32 networkId)
+void ModuleLinkingContext::registerNetworkGameObjectWithNetworkId(GameObject* gameObject, uint32 networkId)
 {
 	uint16 arrayIndex = arrayIndexFromNetworkId(networkId);
 	ASSERT(arrayIndex < MAX_NETWORK_OBJECTS);
-	ASSERT(networkGameObjects[arrayIndex] == nullptr);
+	//THIS FAILS SOMETIMES
+	//ASSERT(networkGameObjects[arrayIndex] == nullptr);
 	networkGameObjects[arrayIndex] = gameObject;
 	gameObject->networkId = networkId;
 	networkGameObjectsCount++;

@@ -41,8 +41,7 @@ struct Spaceship : public Behaviour
 
 		if (input.actionLeft == ButtonState::Press && !App->modNetClient->isConnected())
 		{
-			//Only spawn bullets if it is the server who is processing inputs. Otherwise the structure will be completely broken.
-			//TODO: TRY TO FIX THIS IN ORDER TO MAKE THE BULLETS NOT SO LAGGY.
+			//Only spawn bullets if it is the server who is processing inputs.
 			GameObject * laser = App->modNetServer->spawnBullet(gameObject);
 			laser->tag = gameObject->tag;
 		}

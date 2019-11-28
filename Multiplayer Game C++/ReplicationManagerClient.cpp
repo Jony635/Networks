@@ -69,6 +69,8 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet)
 						// Create behaviour
 						gameObject->behaviour = new Spaceship;
 						gameObject->behaviour->gameObject = gameObject;
+
+						gameObject->order = 1;
 					}
 					else
 					{

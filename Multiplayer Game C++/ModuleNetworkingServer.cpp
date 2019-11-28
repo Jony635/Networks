@@ -352,6 +352,8 @@ GameObject * ModuleNetworkingServer::spawnPlayer(ClientProxy &clientProxy, uint8
 	clientProxy.gameObject->size = { 100, 100 };
 	clientProxy.gameObject->angle = 45.0f;
 
+	clientProxy.gameObject->order = 1;
+
 	if (spaceshipType == 0) {
 		clientProxy.gameObject->texture = App->modResources->spacecraft1;
 	}
