@@ -53,6 +53,9 @@ void ModuleNetworkingClient::onStart()
 	secondsSinceLastInputDelivery = 0.0f;
 	secondsSinceLastPing = 0.0f;
 	lastPacketReceivedTime = Time.time;
+
+	repManager = {};
+	delManager = {};
 }
 
 void ModuleNetworkingClient::onGui()
@@ -179,8 +182,7 @@ void ModuleNetworkingClient::onUpdate()
 		state = ClientState::WaitingWelcome;
 	}
 	else if (state == ClientState::WaitingWelcome)
-	{
-	}
+	{	}
 	else if (state == ClientState::Playing)
 	{
 		secondsSinceLastInputDelivery += Time.deltaTime;
