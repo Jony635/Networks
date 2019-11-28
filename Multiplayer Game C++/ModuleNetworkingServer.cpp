@@ -69,6 +69,7 @@ void ModuleNetworkingServer::onGui()
 					ImGui::Text(" - port: %d", ntohs(clientProxies[i].address.sin_port));
 					ImGui::Text(" - name: %s", clientProxies[i].name.c_str());
 					ImGui::Text(" - id: %d", clientProxies[i].clientId);
+					ImGui::Text(" - enabled: %s", clientProxies[i].gameObject->enabled ? "true" : "false");
 					ImGui::Text(" - Last packet time: %.04f", clientProxies[i].lastPacketReceivedTime);
 					ImGui::Text(" - Seconds since repl.: %.04f", clientProxies[i].secondsSinceLastReplication);
 					
@@ -425,6 +426,9 @@ GameObject * ModuleNetworkingServer::spawnBullet(GameObject *parent)
 void ModuleNetworkingServer::SpaceShipDestroy(GameObject *spaceShip)
 {
 	spaceShip->enabled = false;
+
+	if (!App->modNetClient->isConnected())
+		NetworkUpdate(spaceShip);
 }
 
 
@@ -453,7 +457,7 @@ void ModuleNetworkingServer::destroyNetworkObject(GameObject * gameObject)
 
 void ModuleNetworkingServer::updateNetworkObject(GameObject * gameObject)
 {
-	// Notify all client proxies' replication manager to destroy the object remotely
+	// Notify all client proxies' replication manager to update the object remotely
 	for (int i = 0; i < MAX_CLIENTS; ++i)
 	{
 		if (clientProxies[i].connected)
