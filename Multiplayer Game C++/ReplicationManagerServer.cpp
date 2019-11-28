@@ -63,6 +63,8 @@ void ReplicationManagerServer::write(OutputMemoryStream& packet)
 					packet << gameObject->size.x;
 					packet << gameObject->size.y;
 
+					packet << gameObject->enabled;
+
 					if (gameObject->texture == App->modResources->spacecraft1)
 						packet << (uint8)1;
 					else if (gameObject->texture == App->modResources->spacecraft2)
@@ -91,6 +93,18 @@ void ReplicationManagerServer::write(OutputMemoryStream& packet)
 					packet << gameObject->color.g;
 					packet << gameObject->color.b;
 					packet << gameObject->color.a;
+					packet << gameObject->size.x;
+					packet << gameObject->size.y;
+					packet << gameObject->enabled;
+
+					if (gameObject->texture == App->modResources->spacecraft1)
+						packet << (uint8)1;
+					else if (gameObject->texture == App->modResources->spacecraft2)
+						packet << (uint8)2;
+					else if (gameObject->texture == App->modResources->spacecraft3)
+						packet << (uint8)3;
+					else
+						packet << (uint8)0;
 				}
 
 				break;

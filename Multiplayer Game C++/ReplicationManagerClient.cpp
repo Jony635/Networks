@@ -20,6 +20,7 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet)
 				vec4 color;
 				vec2 size;
 				uint8 spaceShipType;
+				bool enabled;
 
 				packet >> position.x;
 				packet >> position.y;
@@ -34,6 +35,8 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet)
 				packet >> size.x;
 				packet >> size.y;
 
+				packet >> enabled;
+
 				packet >> spaceShipType;
 
 				GameObject* gameObject = Instantiate();
@@ -43,6 +46,7 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet)
 					gameObject->angle = angle;
 					gameObject->color = color;
 					gameObject->size = size;
+					gameObject->enabled = enabled;
 		
 					switch (spaceShipType)
 					{
@@ -93,6 +97,9 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet)
 				vec2 position;
 				float angle;
 				vec4 color;
+				vec2 size;
+				uint8 spaceShipType;
+				bool enabled;
 
 				packet >> position.x;
 				packet >> position.y;
@@ -102,9 +109,18 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet)
 				packet >> color.b;
 				packet >> color.a;
 
+				packet >> size.x;
+				packet >> size.y;
+
+				packet >> enabled;
+
+				packet >> spaceShipType;
+
 				GameObject* gameObject = App->modLinkingContext->getNetworkGameObject(networkId);
 				if (gameObject)
 				{
+					gameObject->enabled = enabled;
+
 					if (networkId == App->modNetClient->getPlayerNetworkID())
 					{
 						gameObject->position = position;
@@ -120,7 +136,59 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet)
 					gameObject->final_angle = angle;
 
 					gameObject->secondsElapsed = .0f;
+				}
+				else //Create the gameObject if this does not exist in this client
+				{
+					GameObject* gameObject = Instantiate();
+					if (gameObject)
+					{
+						gameObject->position = position;
+						gameObject->angle = angle;
+						gameObject->color = color;
+						gameObject->size = size;
+						gameObject->enabled = enabled;
 
+						switch (spaceShipType)
+						{
+							case 0:
+								gameObject->texture = App->modResources->laser;
+								break;
+							case 1:
+								gameObject->texture = App->modResources->spacecraft1;
+								break;
+							case 2:
+								gameObject->texture = App->modResources->spacecraft2;
+								break;
+							case 3:
+								gameObject->texture = App->modResources->spacecraft3;
+								break;
+						}
+
+						if (spaceShipType != 0)
+						{
+							// Create collider
+							gameObject->collider = App->modCollision->addCollider(ColliderType::Player, gameObject);
+							gameObject->collider->isTrigger = true;
+
+							// Create behaviour
+							gameObject->behaviour = new Spaceship;
+							gameObject->behaviour->gameObject = gameObject;
+
+							gameObject->order = 1;
+						}
+						else
+						{
+							// Create collider
+							gameObject->collider = App->modCollision->addCollider(ColliderType::Laser, gameObject);
+							gameObject->collider->isTrigger = true;
+
+							// Create behaviour
+							/*gameObject->behaviour = new Laser();
+							gameObject->behaviour->gameObject = gameObject;*/
+						}
+
+						App->modLinkingContext->registerNetworkGameObjectWithNetworkId(gameObject, networkId);
+					}
 				}
 
 				break;

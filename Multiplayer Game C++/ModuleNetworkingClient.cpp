@@ -150,7 +150,7 @@ void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream &packet, c
 			//from inputDataFront to inputDataBack apply all inputs to our gameObject.
 
 			GameObject* playerGameObject = App->modLinkingContext->getNetworkGameObject(networkId);
-			if (playerGameObject != nullptr)
+			if (playerGameObject != nullptr && playerGameObject->enabled)
 			{
 				for (int i = inputDataFront; i != inputDataBack; ++i)
 				{
@@ -199,7 +199,7 @@ void ModuleNetworkingClient::onUpdate()
 
 			//Process the new input: Client Side
 			GameObject* playerGameObject = App->modLinkingContext->getNetworkGameObject(networkId);
-			if (playerGameObject != nullptr)
+			if (playerGameObject != nullptr && playerGameObject->enabled)
 			{
 				playerGameObject->behaviour->onInput(Input);
 			}
@@ -251,7 +251,7 @@ void ModuleNetworkingClient::onUpdate()
 
 	// Make the camera focus the player game object
 	GameObject *playerGameObject = App->modLinkingContext->getNetworkGameObject(networkId);
-	if (playerGameObject != nullptr)
+	if (playerGameObject != nullptr && playerGameObject->enabled)
 	{
 		App->modRender->cameraPosition = playerGameObject->position;
 	}
