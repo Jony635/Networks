@@ -81,7 +81,7 @@ public:
 
 	// NOTE(jesus): Here go spawn methods for each type of network objects
 
-	void SpaceShipDestroy(GameObject *spaceShip);
+	void SpaceShipDestroy(GameObject *spaceShip, uint32 spaceShipKiller);
 
 private:
 

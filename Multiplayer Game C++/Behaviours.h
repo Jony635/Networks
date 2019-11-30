@@ -13,6 +13,26 @@ struct Behaviour
 	virtual void onCollisionTriggered(Collider &c1, Collider &c2) {}
 };
 
+struct Laser : public Behaviour
+{
+	float secondsSinceCreation = 0.0f;
+	uint32 spaceShipOrigin = 0u;
+
+	void update() override
+	{
+		const float pixelsPerSecond = 1000.0f;
+		gameObject->position += vec2FromDegrees(gameObject->angle) * pixelsPerSecond * Time.deltaTime;
+
+		secondsSinceCreation += Time.deltaTime;
+
+		if (!App->modNetClient->isConnected())
+			NetworkUpdate(gameObject);
+
+		const float lifetimeSeconds = 2.0f;
+		if (secondsSinceCreation > lifetimeSeconds) NetworkDestroy(gameObject);
+	}
+};
+
 struct Spaceship : public Behaviour
 {
 	void start() override
@@ -42,8 +62,11 @@ struct Spaceship : public Behaviour
 		if (input.actionLeft == ButtonState::Press && !App->modNetClient->isConnected())
 		{
 			//Only spawn bullets if it is the server who is processing inputs.
-			GameObject * laser = App->modNetServer->spawnBullet(gameObject);
+			GameObject* laser = App->modNetServer->spawnBullet(gameObject);
 			laser->tag = gameObject->tag;
+
+			Laser* laserBehavior = (Laser*)laser->behaviour;
+			laserBehavior->spaceShipOrigin = gameObject->networkId;
 		}
 	}
 
@@ -58,26 +81,7 @@ struct Spaceship : public Behaviour
 			// the client proxy will poing to an invalid gameObject...
 			// instead, make the gameObject invisible or disconnect the client.
 
-			App->modNetServer->SpaceShipDestroy(c1.gameObject);
+			App->modNetServer->SpaceShipDestroy(c1.gameObject, ((Laser*)c2.gameObject->behaviour)->spaceShipOrigin);
 		}
-	}
-};
-
-struct Laser : public Behaviour
-{
-	float secondsSinceCreation = 0.0f;
-
-	void update() override
-	{
-		const float pixelsPerSecond = 1000.0f;
-		gameObject->position += vec2FromDegrees(gameObject->angle) * pixelsPerSecond * Time.deltaTime;
-
-		secondsSinceCreation += Time.deltaTime;
-
-		if(!App->modNetClient->isConnected())
-			NetworkUpdate(gameObject);
-
-		const float lifetimeSeconds = 2.0f;
-		if (secondsSinceCreation > lifetimeSeconds) NetworkDestroy(gameObject);
 	}
 };

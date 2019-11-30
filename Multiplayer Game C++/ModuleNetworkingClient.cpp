@@ -1,4 +1,5 @@
 #include "Networks.h"
+#include "ModuleNetworkingClient.h"
 
 
 
@@ -107,6 +108,23 @@ void ModuleNetworkingClient::onGui()
 			ImGui::InputFloat("Delivery interval (s)", &inputDeliveryIntervalSeconds, 0.01f, 0.1f, 4);
 		}
 	}
+
+	ImGui::Begin("Score Rank");
+
+	if(!playerBeforeName.empty())
+		ImGui::Text("Previous player: %s Points: %u", playerBeforeName.c_str(), playerBeforePoints);
+	else
+		ImGui::Text("Previous player: NONE");
+
+	ImGui::Text("You: %s Points: %u", playerName.c_str(), points);
+
+	if(!playerAfterName.empty())
+		ImGui::Text("Following player: %s Points: %u", playerAfterName.c_str(), playerAfterPoints);
+	else	
+		ImGui::Text("Following player: NONE");
+
+
+	ImGui::End();
 }
 
 void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream &packet, const sockaddr_in &fromAddress)
@@ -164,6 +182,17 @@ void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream &packet, c
 					playerGameObject->behaviour->onInput(Input);
 				}
 			}	
+		}
+		else if (message == ServerMessage::ScoreListUpdate)
+		{
+			packet >> playerBeforeName;
+			packet >> playerBeforePoints;
+			packet >> playerAfterName;
+			packet >> playerAfterPoints;
+		}
+		else if (message == ServerMessage::EnemyKilled)
+		{
+			OnEnemyKilled();
 		}
 	}
 }
@@ -283,4 +312,9 @@ void ModuleNetworkingClient::onDisconnect()
 	}
 
 	App->modRender->cameraPosition = {};
+}
+
+void ModuleNetworkingClient::OnEnemyKilled()
+{
+	points += 20;
 }

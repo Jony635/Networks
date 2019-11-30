@@ -246,7 +246,7 @@ void ModuleNetworkingServer::onUpdate()
 		replicationDeliveryTimer += Time.deltaTime;
 
 		//ScoreList Timers
-		updateScoreListTimer *= Time.deltaTime;
+		updateScoreListTimer += Time.deltaTime;
 		if (updateScoreListTimer >= updateScoreListIntervalSeconds)
 		{
 			updateScoreListTimer = 0.0f;
@@ -423,12 +423,23 @@ GameObject * ModuleNetworkingServer::spawnBullet(GameObject *parent)
 }
 
 
-void ModuleNetworkingServer::SpaceShipDestroy(GameObject *spaceShip)
+void ModuleNetworkingServer::SpaceShipDestroy(GameObject *spaceShip, uint32 spaceShipOriginal)
 {
 	spaceShip->enabled = false;
 
 	if (!App->modNetClient->isConnected())
 		NetworkUpdate(spaceShip);
+
+	for (ClientProxy& proxy : clientProxies)
+	{
+		if(proxy.gameObject->networkId == spaceShipOriginal)
+		{
+			OutputMemoryStream packet;
+			packet << ServerMessage::EnemyKilled;
+			sendPacket(packet, proxy.address);
+			return;
+		}
+	}
 }
 
 
@@ -481,9 +492,10 @@ bool ModuleNetworkingServer::SortProxies()
 			//Sort by:
 			// - Connected with more points before.
 			// - Connected with less points after.
-			// - Disconnected at the end.
+			// - Disconnected and disabled at the end.
 
 			if ((!clientProxies[i].connected && clientProxies[i + 1].connected) ||
+				(clientProxies[i].gameObject && !clientProxies[i].gameObject->enabled && clientProxies[i+1].gameObject && clientProxies[i+1].gameObject->enabled) ||
 				(clientProxies[i].points < clientProxies[i + 1].points))
 			{
 				ClientProxy a = clientProxies[i];
@@ -502,8 +514,10 @@ bool ModuleNetworkingServer::SortProxies()
 void ModuleNetworkingServer::UpdateScoreLists()
 {
 	//If there are no score differences just skip.
-	if (!SortProxies())
-		return;
+	/*if (!SortProxies())
+		return;*/
+
+	SortProxies();
 
 	for (int i = 0; i < MAX_CLIENTS; ++i)
 	{

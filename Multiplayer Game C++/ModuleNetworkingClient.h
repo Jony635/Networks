@@ -19,6 +19,8 @@ public:
 
 	inline uint32 getPlayerNetworkID() const { return networkId; }
 
+	void OnEnemyKilled();
+
 private:
 
 	//////////////////////////////////////////////////////////////////////
@@ -38,8 +40,6 @@ private:
 	void onConnectionReset(const sockaddr_in &fromAddress) override;
 
 	void onDisconnect() override;
-
-
 
 	//////////////////////////////////////////////////////////////////////
 	// Client state
@@ -67,6 +67,12 @@ private:
 
 	//Game related stuff
 	uint32 points = 0u;
+
+	std::string playerBeforeName;
+	uint32 playerBeforePoints = 0u;
+
+	std::string playerAfterName;
+	uint32 playerAfterPoints = 0u;
 
 	// Input ///////////
 

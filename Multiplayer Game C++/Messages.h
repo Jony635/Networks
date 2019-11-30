@@ -13,5 +13,6 @@ enum class ServerMessage
 	Unwelcome,
 	Replication,
 	Ping,
-	ScoreListUpdate
+	ScoreListUpdate,
+	EnemyKilled
 };
