@@ -1,4 +1,5 @@
 #include "Networks.h"
+#include "ModuleRender.h"
 
 
 #define SAFE_RELEASE(lp) if (lp != nullptr) { lp->Release(); lp = nullptr; }
@@ -395,6 +396,15 @@ static void selectAndSortObjects(GameObject toSort[MAX_GAME_OBJECTS], GameObject
 	{
 		quicksort(result, 0, *numElems - 1);
 	}
+}
+
+void ModuleRender::getViewportSize(float& width, float& height)
+{
+	RECT rect;
+	GetClientRect(hwnd, &rect);
+
+	width = (float)(rect.right - rect.left);
+	height = (float)(rect.bottom - rect.top);
 }
 
 void ModuleRender::renderScene()

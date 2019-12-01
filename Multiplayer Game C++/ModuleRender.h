@@ -28,6 +28,7 @@ public:
 
 	bool mustRenderColliders = false;
 
+	void getViewportSize(float& width, float& height);
 
 private:
 
