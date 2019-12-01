@@ -27,4 +27,3 @@ Optional features implemented:
 
 - After joining a server, the client will not see the other connected players until they move or shoot the first time.
 - The collision detection is calculated server-side without taking in count that the client's world is in an older state than the server one, because packets take time to arrive, so its collision may feel some weird sometimes through the shooter perspective.
--
