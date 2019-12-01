@@ -3,9 +3,9 @@
 ## Description
 
 SpaceShip.io is a project developed during the 4th year of the Design and Development of Videogames Bachelor's Degree in CITM (UPC), Terrassa, 2019.
-It consist in exploring the basics of networking integrating diferent techniques used in this area, in form of a simple spaceship battle game taking Agar.io as reference.
+It consists of exploring the basics of networking integrating different techniques used in this area, in form of a simple spaceship battle game taking Agar.io as reference.
 
-Each client which join to a server will keep fighting against the other ships until some laser hits her though the server perspective, in which case she will get destroyed and disconnected.
+Each client which joins a server will keep fighting against other ships until a laser hits it through the server perspective, in which case it will get destroyed and the client disconnected.
 For each ship you destroy you will be rewarded with some points to keep climbing in the Score Rank.
 
 We are FlanStudio, a team composed by two students: Jonathan Molina-Prados Ciudad and Oriol de Dios Miranda.
