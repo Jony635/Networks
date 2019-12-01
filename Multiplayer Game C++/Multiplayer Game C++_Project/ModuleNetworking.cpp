@@ -149,28 +149,50 @@ bool ModuleNetworking::gui()
 
 		if (playerGameObject != nullptr && !playerGameObject->enabled)
 		{
-			ImGui::Begin("GAME OVER");
-
-			if (ImGui::Button("Disconnect")) {
-				disconnect();
-			}
-			ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.45f);
-
-			onGui();
-
-			ImGui::PopItemWidth();
-
-			ImGui::End();
-
-			if (deathTimer >= DEATH_TIME)
-			{
-				deathTimer = 0.0f;
-				disconnect();
-			}
-			else deathTimer += 0.01; //Don't know where is DT...
-
-			return true;
+			ImGui::OpenPopup("GAME OVER");
 		}
+	}
+
+	if (ImGui::BeginPopupModal("GAME OVER", nullptr, ImGuiWindowFlags_::ImGuiWindowFlags_NoTitleBar))
+	{
+		float windowWidth, windowHeight;
+		App->modRender->getViewportSize(windowWidth, windowHeight);
+
+		ImGui::SetWindowSize({ windowWidth, windowHeight });
+
+		ImGui::NewLine();
+		ImGui::NewLine();
+		ImGui::NewLine();
+
+		ImVec2 cursorPos = ImGui::GetCursorScreenPos();
+		ImGui::SetCursorPos({ windowWidth / 2 - ImGui::CalcTextSize("GAME OVER").x / 2, cursorPos.y});
+		ImGui::Text("GAME OVER");
+
+		ImGui::NewLine();
+		ImGui::NewLine();
+		ImGui::NewLine();
+
+		cursorPos = ImGui::GetCursorScreenPos();
+		ImGui::SetCursorPos({ windowWidth / 2 - 250/2, cursorPos.y });
+
+		if (ImGui::Button("Disconnect", {250, 250/2}))
+		{
+			disconnect();
+		}
+
+		onGui();
+		
+		if (deathTimer >= DEATH_TIME)
+		{
+			deathTimer = 0.0f;
+			disconnect();
+		}
+
+		deathTimer += Time.deltaTime;
+
+		ImGui::EndPopup();
+
+		return true;
 	}
 
 	if (isConnected())
