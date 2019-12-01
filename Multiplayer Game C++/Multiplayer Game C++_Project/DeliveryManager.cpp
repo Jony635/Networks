@@ -116,5 +116,14 @@ void DeliveryDelegateStandard::OnDeliverySuccess(DeliveryManager* delManager)
 
 void DeliveryDelegateStandard::OnDeliveryFailure(DeliveryManager* delManager)
 {
-	//ELOG("Packet lost");
+	GameObject* networkObjects[MAX_NETWORK_OBJECTS];
+	uint16 size;
+	App->modLinkingContext->getNetworkGameObjects(networkObjects, &size);
+
+	for (int i = 0; i < size; ++i)
+	{
+		NetworkUpdate(networkObjects[i]);
+	}
+
+	//All network objects will be updated on the next replication packet, to ensure everyone has the last state.
 }

@@ -45,7 +45,7 @@ GameObject * ModuleLinkingContext::getNetworkGameObject(uint32 networkId)
 	}
 }
 
-void ModuleLinkingContext::getNetworkGameObjects(GameObject * gameObjects[MAX_NETWORK_OBJECTS], uint16 * count)
+void ModuleLinkingContext::getNetworkGameObjects(GameObject* gameObjects[MAX_NETWORK_OBJECTS], uint16 * count)
 {
 	uint16 insertIndex = 0;
 

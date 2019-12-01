@@ -112,8 +112,8 @@ void ModuleNetworkingClient::onGui()
 	float windowWidth, windowHeight;
 	App->modRender->getViewportSize(windowWidth, windowHeight);
 
-	ImGui::SetNextWindowPos(ImVec2(windowWidth, windowHeight), 0, ImVec2(1.0f, 5.0f));
-	ImGui::SetNextWindowSize(ImVec2(windowWidth * 0.20, windowHeight * 0.20), ImGuiCond_::ImGuiCond_Always);
+	ImGui::SetNextWindowPos(ImVec2(windowWidth, 0), 0, ImVec2(1.0f, 0.0f));
+	ImGui::SetNextWindowSize(ImVec2(windowWidth * 0.25, windowHeight * 0.25), ImGuiCond_::ImGuiCond_Always);
 	ImGui::Begin("Score Rank", nullptr, ImGuiWindowFlags_::ImGuiWindowFlags_NoMove | ImGuiWindowFlags_::ImGuiWindowFlags_NoResize);
 
 	if(!playerBeforeName.empty())
